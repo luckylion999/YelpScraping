@@ -19,7 +19,7 @@ ITEM_PIPELINES = {'Yelp_Scraping.pipelines.CSVPipeline': 300}
 
 DOWNLOADER_MIDDLEWARES = {'scrapy_crawlera.CrawleraMiddleware': 610}
 CRAWLERA_ENABLED = True
-CRAWLERA_APIKEY = '434aae8e3b534c7894de32c88c1c5f42'
+CRAWLERA_APIKEY = '434aae***5f42'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

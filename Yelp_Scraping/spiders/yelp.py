@@ -1,6 +1,7 @@
 import scrapy
 import re
 
+
 class YelpItem(scrapy.Item):
     business_name = scrapy.Field()
     industry_category = scrapy.Field()
@@ -12,7 +13,6 @@ class YelpItem(scrapy.Item):
     email = scrapy.Field()
     url = scrapy.Field()
     count = scrapy.Field()
-
 
 
 class GoogleApp (scrapy.Spider):
@@ -34,8 +34,6 @@ class GoogleApp (scrapy.Spider):
         categories.pop(0)
         for category in categories:
             yield scrapy.Request(url=self.PAGE_URL.format(page_num=0, category=category), callback=self._parse_categories)
-        # yield scrapy.Request(url=self.PAGE_URL.format(page_num=0, category=categories[1]),
-        #                      callback=self._parse_categories, dont_filter=True)
 
     def _parse_categories(self, response):
         page_count = response.xpath('//div[@class="pagination-block"]//div[contains(@class, "page-of-pages")]/text()').extract()
@@ -48,7 +46,7 @@ class GoogleApp (scrapy.Spider):
         count_per_page = response.xpath('//span[@class="pagination-results-window"]/text()').extract()
         count_per_page = int(re.search('-(.*?)of', count_per_page[0], re.DOTALL).group(1).strip())
 
-        for i in range(0, page_count):
+        for i in range(page_count):
             yield scrapy.Request(url=self.PAGE_URL.format(page_num=i*count_per_page, category=category),
                                  callback=self._parse_links, dont_filter=True)
 
@@ -74,9 +72,7 @@ class GoogleApp (scrapy.Spider):
     def _parse_data(self, response):
         self.count += 1
         if response.xpath('//span[contains(@class, "claim-status_icon--unclaimed")]'):
-
             item = YelpItem()
-
             item['business_name'] = response.xpath('//h1[contains(@class, "biz-page-title")]/text()')[0].extract().strip()
             item['industry_category'] = 'Pets'
             item['city'] = 'Las Vegas'
@@ -88,12 +84,7 @@ class GoogleApp (scrapy.Spider):
                 address += add + ' '
             item['street_address'] = address.strip()
             website_link = response.xpath('//span[@class="biz-website js-add-url-tagging"]/a/text()').extract()
-            if website_link:
-                item['website'] = website_link[0]
-            else:
-                item['website'] = ''
+            item['website'] = website_link[0] if website_link else ''
             item['url'] = response.url
-
             item['count'] = self.count
-
             yield item
